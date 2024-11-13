@@ -2,6 +2,8 @@
 #include "ALSADevices.hpp"
 
 bool ALSAPCMDevice::open() {
+    snd_pcm_hw_params_t *params;
+
     /* Open PCM device. */
     int rc = snd_pcm_open(&handle, device_name.c_str(), type, 0);
     if (rc < 0) {
@@ -45,7 +47,6 @@ bool ALSAPCMDevice::open() {
 void ALSAPCMDevice::close() {
     snd_pcm_drain(handle);
     snd_pcm_close(handle);
-    snd_pcm_hw_params_free(params);
 }
 
 char* ALSAPCMDevice::allocate_buffer() {
