@@ -9,6 +9,7 @@
 class ALSAPCMDevice {
     protected:
     snd_pcm_t* handle;
+    snd_pcm_hw_params_t *params;
     std::string device_name;
     unsigned int sample_rate, channels;             // Quality of the recorded audio.
     snd_pcm_uframes_t frames_per_period;            // Latency - lower numbers will decrease latency and increase CPU usage.

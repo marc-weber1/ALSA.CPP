@@ -2,7 +2,6 @@
 #include "ALSADevices.hpp"
 
 bool ALSAPCMDevice::open() {
-    snd_pcm_hw_params_t *params;
     /* Open PCM device. */
     int rc = snd_pcm_open(&handle, device_name.c_str(), type, 0);
     if (rc < 0) {
@@ -21,16 +20,12 @@ bool ALSAPCMDevice::open() {
     /* Interleaved mode */
     snd_pcm_hw_params_set_access(handle, params, SND_PCM_ACCESS_RW_INTERLEAVED);
 
-    /* Signed 16-bit little-endian format */
-    snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S16_LE);
+    snd_pcm_hw_params_set_format(handle, params, format);
 
-    /* Two channels (stereo) */
-    snd_pcm_hw_params_set_channels(handle, params, 1);
+    snd_pcm_hw_params_set_channels(handle, params, channels);
 
-    /* 44100 bits/second sampling rate (CD quality) */
     snd_pcm_hw_params_set_rate_near(handle, params, &sample_rate, NULL);
-
-    /* Set period size to 32 frames. */
+    
     snd_pcm_hw_params_set_period_size_near(handle,
                                 params, &frames_per_period, NULL);
 
@@ -43,11 +38,14 @@ bool ALSAPCMDevice::open() {
 
     /* Use a buffer large enough to hold one period */
     snd_pcm_hw_params_get_period_size(params, &frames_per_period, NULL);
+
+    return true;
 }
 
 void ALSAPCMDevice::close() {
     snd_pcm_drain(handle);
     snd_pcm_close(handle);
+    snd_pcm_hw_params_free(params);
 }
 
 char* ALSAPCMDevice::allocate_buffer() {
@@ -84,8 +82,9 @@ unsigned int ALSACaptureDevice::capture_into_buffer(char* buffer, snd_pcm_uframe
             fprintf(stderr, "error from readi: %s\n", snd_strerror(frames_read));
             return 0;
         }
-        return frames_read;
     }
+
+    return frames_read;
 }
 
 unsigned int ALSAPlaybackDevice::play_from_buffer(char* buffer, snd_pcm_uframes_t frames_to_play) {
