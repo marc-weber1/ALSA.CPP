@@ -59,6 +59,7 @@ class ALSACaptureDevice : public ALSAPCMDevice {
     {}
 
     unsigned int capture_into_buffer(char* buffer, snd_pcm_uframes_t frames_to_capture);
+    unsigned int samples_left_to_read();
 };
 
 

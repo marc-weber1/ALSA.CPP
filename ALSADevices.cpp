@@ -88,6 +88,17 @@ unsigned int ALSACaptureDevice::capture_into_buffer(char* buffer, snd_pcm_uframe
     return frames_read;
 }
 
+unsigned int ALSACaptureDevice::samples_left_to_read(){
+    snd_pcm_sframes_t frames_to_read = snd_pcm_avail(handle);
+
+    if(frames_to_read < 0){
+        fprintf(stderr, "error from avail: %s\n", snd_strerror(frames_to_read));
+        return 0;
+    }
+
+    return frames_to_read;
+}
+
 unsigned int ALSAPlaybackDevice::play_from_buffer(char* buffer, snd_pcm_uframes_t frames_to_play) {
     if(frames_to_play != frames_per_period) {
         fprintf(stderr, "frames_to_play must equal frames in period <%lu>\n", frames_per_period);
