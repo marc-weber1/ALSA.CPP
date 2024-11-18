@@ -41,6 +41,9 @@ bool ALSAPCMDevice::open() {
     /* Use a buffer large enough to hold one period */
     snd_pcm_hw_params_get_period_size(params, &frames_per_period, NULL);
 
+    /* Begin capturing from mic */
+    snd_pcm_start(handle);
+
     return true;
 }
 
